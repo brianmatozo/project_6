@@ -13,6 +13,8 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as CreateUsersImport } from './routes/create-users'
+import { Route as AllUsersImport } from './routes/all-users'
 import { Route as IndexImport } from './routes/index'
 
 // Create Virtual Routes
@@ -26,6 +28,18 @@ const AboutLazyRoute = AboutLazyImport.update({
   path: '/about',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
+
+const CreateUsersRoute = CreateUsersImport.update({
+  id: '/create-users',
+  path: '/create-users',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AllUsersRoute = AllUsersImport.update({
+  id: '/all-users',
+  path: '/all-users',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -44,6 +58,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/all-users': {
+      id: '/all-users'
+      path: '/all-users'
+      fullPath: '/all-users'
+      preLoaderRoute: typeof AllUsersImport
+      parentRoute: typeof rootRoute
+    }
+    '/create-users': {
+      id: '/create-users'
+      path: '/create-users'
+      fullPath: '/create-users'
+      preLoaderRoute: typeof CreateUsersImport
+      parentRoute: typeof rootRoute
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -58,36 +86,46 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/all-users': typeof AllUsersRoute
+  '/create-users': typeof CreateUsersRoute
   '/about': typeof AboutLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/all-users': typeof AllUsersRoute
+  '/create-users': typeof CreateUsersRoute
   '/about': typeof AboutLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/all-users': typeof AllUsersRoute
+  '/create-users': typeof CreateUsersRoute
   '/about': typeof AboutLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths: '/' | '/all-users' | '/create-users' | '/about'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '/' | '/all-users' | '/create-users' | '/about'
+  id: '__root__' | '/' | '/all-users' | '/create-users' | '/about'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AllUsersRoute: typeof AllUsersRoute
+  CreateUsersRoute: typeof CreateUsersRoute
   AboutLazyRoute: typeof AboutLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AllUsersRoute: AllUsersRoute,
+  CreateUsersRoute: CreateUsersRoute,
   AboutLazyRoute: AboutLazyRoute,
 }
 
@@ -102,11 +140,19 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/all-users",
+        "/create-users",
         "/about"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/all-users": {
+      "filePath": "all-users.tsx"
+    },
+    "/create-users": {
+      "filePath": "create-users.tsx"
     },
     "/about": {
       "filePath": "about.lazy.tsx"

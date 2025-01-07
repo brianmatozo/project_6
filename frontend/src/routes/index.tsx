@@ -7,7 +7,6 @@ import {
 import { api } from "../lib/api";
 import { useQuery } from "@tanstack/react-query";
 
-
 export const Route = createFileRoute("/")({
   component: Index,
 });
@@ -31,11 +30,12 @@ function Index() {
 
   if (error) return "An error has occurred: " + error.message;
   return (
-    <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel className="p-5">{data}</ResizablePanel>
-      {/* <ResizablePanel className="p-5">one</ResizablePanel> */}
-      <ResizableHandle withHandle />
-      <ResizablePanel className="p-5">Two</ResizablePanel>
-    </ResizablePanelGroup>
+    <div className="">
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel className="p-5">{data}</ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel className="p-5">Two</ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
   );
 }
