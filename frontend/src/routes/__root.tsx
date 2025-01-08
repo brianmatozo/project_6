@@ -5,6 +5,7 @@ import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
+import { Toaster } from "@/components/ui/toaster";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -24,6 +25,7 @@ function RootComponent() {
             <Outlet />
           </main>
         </SidebarProvider>
+        <Toaster />
         <TanStackRouterDevtools />
       </ThemeProvider>
     </>

@@ -15,8 +15,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-// import { api } from "@/lib/api";
-// import { useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/create-users")({
   component: RouteComponent,
@@ -27,15 +28,9 @@ const userCreationSchema = z.object({
   email: z.string().email("Email must be a valid email"),
 });
 
-// async function postUser() {
-//   const res = await api.users.create.post({
-//     email: "email@email",
-//     username: "shadcn",
-//   });
-// }
-
 function RouteComponent() {
   // const navigate = useNavigate();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof userCreationSchema>>({
     resolver: zodResolver(userCreationSchema),
@@ -45,17 +40,42 @@ function RouteComponent() {
     },
   });
 
-  // const mutation = useMutation({
-  //   mutationFn: postUser,
-  // });
+  const mutation = useMutation({
+    mutationFn: async (data: z.infer<typeof userCreationSchema>) => {
+      try {
+        const res = await api.users.create.post({
+          email: data.email,
+          username: data.username,
+        });
+        if (!res.response.ok) {
+          const errorData = JSON.stringify(await res.response.body)
+          throw new Error(errorData || "Server error");
+        }
+        return res;
+      } catch (error) {
+        throw error;
+      }
+    },
+
+    onError: (error: any) => {
+      const errorMessage = error?.message ?? "An error has occurred";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 5000,
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: `Successfully created`,
+      });
+    },
+  });
 
   async function onSubmit(data: z.infer<typeof userCreationSchema>) {
-    // const res = await api.users.create.post(data);
-    // if (!res.response.ok) {
-    //   throw new Error("Server error");
-    // }
-    // navigate({ to: "/" });
-    console.log(data);
+    mutation.mutate(data);
   }
 
   return (
@@ -90,10 +110,9 @@ function RouteComponent() {
             </FormItem>
           )}
         />
-        {/* <Button type="submit" disabled={mutation.isPending}>
+        <Button type="submit" disabled={mutation.isPending}>
           {mutation.isPending ? "Loading..." : "Submit"}
-        </Button> */}
-        <Button type="submit">Submit</Button>
+        </Button>
       </form>
     </Form>
   );

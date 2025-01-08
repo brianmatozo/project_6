@@ -93,3 +93,19 @@ export const users = new Elysia({ prefix: "/api/users" })
     }
   )
 
+  .post(
+    "/create",
+    async ({ body: { username, email } }) => {
+      const [users] = await db.query<RowDataPacket[]>(
+        "INSERT INTO users (username, email) VALUES (?, ?)",
+        [username, email]
+      );
+      return users as User[];
+    },
+    {
+      body: t.Object({
+        username: t.String(),
+        email: t.String(),
+      }),
+    }
+  );
