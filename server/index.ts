@@ -5,7 +5,11 @@ import staticPlugin from "@elysiajs/static";
 import path from "path";
 import cors from "@elysiajs/cors";
 
+//dev
 const distPath = path.resolve(__dirname, "../frontend/dist");
+
+//docker
+// const distPath = path.resolve(__dirname, "frontend/dist");
 
 const app = new Elysia()
   .use(swagger())

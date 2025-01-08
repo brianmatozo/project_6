@@ -1,6 +1,8 @@
 import Elysia, { t } from "elysia";
-import { mockUsers } from "../data/users";
 import { z } from "zod";
+import db from "../db";
+import { faker } from "@faker-js/faker";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 const userSchema = z.object({
   id: z.number().int().positive(),
@@ -17,108 +19,77 @@ const userCreationSchema = z.object({
 });
 
 export const users = new Elysia({ prefix: "/api/users" })
-  .get(
-    "/",
-    ({ query: { limit } }) => {
-      return mockUsers.slice(0, limit);
-    },
-    {
-      query: t.Optional(
-        t.Object({
-          limit: t.Number(),
-        })
-      ),
-    }
-  )
+  .get("/db", async () => {
+    const [users] = await db.query<RowDataPacket[]>("SELECT * FROM users");
+    return users;
+  })
 
-  .get(
-    "/:id",
-    ({ params }) => {
-      const id = Number(params.id);
-      return mockUsers.find((user) => user.id === id);
+  .post(
+    "/db",
+    async ({ body }) => {
+      const { limit } = body;
+
+      const fakeUsers = Array.from({ length: limit }, () => ({
+        username: faker.internet.username(),
+        email: faker.internet.email(),
+        created_at: faker.date.anytime(),
+      }));
+      const values = fakeUsers.map((user) => [
+        user.username,
+        user.email,
+        user.created_at,
+      ]);
+      const [result] = await db.query<ResultSetHeader>(
+        "INSERT INTO users (username, email, created_at) VALUES ?",
+        [values]
+      );
+      return {
+        inserted: result.affectedRows,
+      };
     },
     {
-      params: t.Object({
-        id: t.Number(),
+      body: t.Object({
+        limit: t.Number({ minimum: 1, maximum: 100 }),
       }),
     }
   )
 
   .post(
-    "/",
-    ({ body }) => {
-      if (!users) {
-        throw new Error("User not found");
+    "/db-batch",
+    async ({ body }) => {
+      const { limit, batchSize } = body;
+
+      const actualBatchSize = Math.min(batchSize || 1000, 10000);
+      const totalBatches = Math.ceil(limit / actualBatchSize);
+
+      let inserted = 0;
+
+      for (let batch = 0; batch < totalBatches; batch++) {
+        const fakeUsers = Array.from({ length: actualBatchSize }, () => ({
+          username: faker.internet.username(),
+          email: faker.internet.email(),
+        }));
+
+        const values = fakeUsers.map((user) => [user.username, user.email]);
+
+        const [result] = await db.query<ResultSetHeader>(
+          "INSERT INTO users (username, email) VALUES ?",
+          [values]
+        );
+
+        inserted += result.affectedRows;
       }
 
-      if (!userCreationSchema.safeParse(body).success) {
-        throw new Error("Invalid user data");
-      }
-      const user = body as User;
-
-      const lastId = mockUsers[mockUsers.length - 1].id;
-      const id = lastId + 1;
-      const createdAt = new Date().toISOString();
-      const newUser = { ...user, id, created_at: createdAt };
-      mockUsers.push(newUser);
-      return newUser;
+      return {
+        inserted,
+        message: `Inserted ${inserted} users in ${totalBatches} batches`,
+      };
     },
     {
       body: t.Object({
-        username: t.String(),
-        email: t.String(),
+        limit: t.Number({ minimum: 1, maximum: 10000000 }),
+        batchSize: t.Optional(t.Number({ minimum: 1, maximum: 10000 })),
       }),
     }
   )
 
-  .put(
-    "/:id",
-    ({ params, body }) => {
-      const id = params.id;
-      const user = mockUsers.find((user) => user.id === id);
-      if (!user) {
-        throw new Error("User not found");
-      }
-      const updatedUser = userCreationSchema.parse(body);
-      Object.assign(user, updatedUser);
-      return user;
-    },
-    {
-      params: t.Object({
-        id: t.Number(),
-      }),
-      body: t.Object({
-        username: t.String(),
-        email: t.String(),
-      }),
-    }
-  )
-
-  .delete(
-    "/:id",
-    ({ params }) => {
-      const id = params.id;
-      const user = mockUsers.find((user) => user.id === id);
-      if (!user) {
-        throw new Error("User not found");
-      }
-      mockUsers.splice(mockUsers.indexOf(user), 1);
-      return user;
-    },
-    {
-      params: t.Object({
-        id: t.Number(),
-      }),
-    }
-  )
-  .get(
-    "/id-count",
-    () => {
-      return { count: mockUsers.length };
-    },
-    {
-      response: t.Object({
-        count: t.Number(),
-      }),
-    }
-  );
