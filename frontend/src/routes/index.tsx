@@ -29,7 +29,7 @@ function Index() {
   // if (isPending) return "Loading...";
 
   // if (error) return "An error has occurred: " + error.message;
-  return (
+  return (  
     <div className="">
       <ResizablePanelGroup direction="horizontal">
         {/* <ResizablePanel className="p-5">{data}</ResizablePanel> */}

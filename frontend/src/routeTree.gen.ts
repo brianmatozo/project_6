@@ -13,6 +13,7 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as StockIndexImport } from './routes/stock-index'
 import { Route as CreateUsersImport } from './routes/create-users'
 import { Route as AllUsersImport } from './routes/all-users'
 import { Route as IndexImport } from './routes/index'
@@ -22,6 +23,12 @@ import { Route as IndexImport } from './routes/index'
 const AboutLazyImport = createFileRoute('/about')()
 
 // Create/Update Routes
+
+const StockIndexRoute = StockIndexImport.update({
+  id: '/stock-index',
+  path: '/stock-index',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const AboutLazyRoute = AboutLazyImport.update({
   id: '/about',
@@ -72,6 +79,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreateUsersImport
       parentRoute: typeof rootRoute
     }
+    '/stock-index': {
+      id: '/stock-index'
+      path: '/stock-index'
+      fullPath: '/stock-index'
+      preLoaderRoute: typeof StockIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -88,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/all-users': typeof AllUsersRoute
   '/create-users': typeof CreateUsersRoute
+  '/stock-index': typeof StockIndexRoute
   '/about': typeof AboutLazyRoute
 }
 
@@ -95,6 +110,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/all-users': typeof AllUsersRoute
   '/create-users': typeof CreateUsersRoute
+  '/stock-index': typeof StockIndexRoute
   '/about': typeof AboutLazyRoute
 }
 
@@ -103,15 +119,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/all-users': typeof AllUsersRoute
   '/create-users': typeof CreateUsersRoute
+  '/stock-index': typeof StockIndexRoute
   '/about': typeof AboutLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/all-users' | '/create-users' | '/about'
+  fullPaths: '/' | '/all-users' | '/create-users' | '/stock-index' | '/about'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/all-users' | '/create-users' | '/about'
-  id: '__root__' | '/' | '/all-users' | '/create-users' | '/about'
+  to: '/' | '/all-users' | '/create-users' | '/stock-index' | '/about'
+  id:
+    | '__root__'
+    | '/'
+    | '/all-users'
+    | '/create-users'
+    | '/stock-index'
+    | '/about'
   fileRoutesById: FileRoutesById
 }
 
@@ -119,6 +142,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AllUsersRoute: typeof AllUsersRoute
   CreateUsersRoute: typeof CreateUsersRoute
+  StockIndexRoute: typeof StockIndexRoute
   AboutLazyRoute: typeof AboutLazyRoute
 }
 
@@ -126,6 +150,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AllUsersRoute: AllUsersRoute,
   CreateUsersRoute: CreateUsersRoute,
+  StockIndexRoute: StockIndexRoute,
   AboutLazyRoute: AboutLazyRoute,
 }
 
@@ -142,6 +167,7 @@ export const routeTree = rootRoute
         "/",
         "/all-users",
         "/create-users",
+        "/stock-index",
         "/about"
       ]
     },
@@ -153,6 +179,9 @@ export const routeTree = rootRoute
     },
     "/create-users": {
       "filePath": "create-users.tsx"
+    },
+    "/stock-index": {
+      "filePath": "stock-index.tsx"
     },
     "/about": {
       "filePath": "about.lazy.tsx"
