@@ -1,4 +1,41 @@
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "3000:3000"
+    secrets:
+      - db-password
+    environment:
+      - NODE_ENV=development
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_DATABASE=mydb
+    volumes:
+      - ./frontend/dist:/app/frontend/dist
+      - ./package.json:/app/package.json
+      - ./bun.lockb:/app/bun.lockb
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    restart: always
+    secrets:
+      - db-password
+    environment:
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-password
+      - MYSQL_DATABASE=mydb
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
   frontend:
     build:
       context: .
@@ -8,40 +45,13 @@ services:
     networks:
       - app-network
 
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
-    ports:
-      - "3000:3000"
-    environment:
-      - DATABASE_URL=mysql://root:password@mysql:3306/db
-    volumes:
-      - ./frontend/dist:/app/frontend/dist
-    depends_on:
-      - mysql
-    networks:
-      - app-network
-
-  mysql:
-    image: mysql:latest
-    container_name: mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mydb
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-    ports:
-      - "3306:3306"
-    volumes:
-      - db_data_3:/var/lib/mysql
-    networks:
-      - app-network
-
 volumes:
-  db_data_3:
+  db_data:
 
 networks:
   app-network:
     driver: bridge
+
+secrets:
+  db-password:
+    file: db/password.txt

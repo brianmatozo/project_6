@@ -41,3 +41,10 @@ yarn-error.log*
 **/*.log
 package-lock.json
 **/*.bun
+
+/.git
+*/.git
+/.git*
+.git/*
+*.git/
+/.idea
