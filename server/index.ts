@@ -5,13 +5,14 @@ import staticPlugin from "@elysiajs/static";
 import path from "path";
 import cors from "@elysiajs/cors";
 import { config } from "dotenv";
+import tokenMiddleware from "./middleware/token";
 // import { stock_idxes } from "./routes/stock_indexes";
 
 //dev
-//const distPath = path.resolve(__dirname, "../frontend/dist");
+const distPath = path.resolve(__dirname, "../frontend/dist");
 
 //docker
-const distPath = path.resolve(__dirname, "frontend/dist");
+//const distPath = path.resolve(__dirname, "frontend/dist");
 config();
 
 const app = new Elysia()
@@ -24,6 +25,7 @@ const app = new Elysia()
       indexHTML: true,
     }),
   )
+  .use(tokenMiddleware)
   .use(users)
   .listen(3000);
 

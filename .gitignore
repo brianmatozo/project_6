@@ -5,7 +5,7 @@
 node_modules/*
 /.pnp
 .pnp.js
-/db
+
 # testing
 /coverage
 
@@ -48,3 +48,10 @@ package-lock.json
 .git/*
 *.git/
 /.idea
+
+db/
+/db
+*/db
+db/*
+*db/
+/db*

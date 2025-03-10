@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Link } from "@tanstack/react-router";
-import { Coins, Home, Plus, Settings } from "lucide-react";
+import { Home, Plus, Settings } from "lucide-react";
 
 const items = [
   {
@@ -30,11 +30,6 @@ const items = [
     icon: Plus,
   },
   {
-    title: "Stock Index",
-    url: "/stock-index",
-    icon: Coins,
-  },
-  {
     title: "About",
     url: "/about",
     icon: Settings,
@@ -43,7 +38,7 @@ const items = [
 
 export function AppSidebar() {
   return (
-    <Sidebar >
+    <Sidebar>
       <SidebarHeader />
       <SidebarContent>
         <SidebarGroup />

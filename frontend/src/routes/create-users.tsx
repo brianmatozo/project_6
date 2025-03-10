@@ -26,6 +26,7 @@ export const Route = createFileRoute("/create-users")({
 const userCreationSchema = z.object({
   username: z.string().regex(/[A-Za-z]+/i, "Username must be a string"),
   email: z.string().email("Email must be a valid email"),
+  password: z.string().regex(/[A-Za-z]+/i, "Password must be a string"),
 });
 
 function RouteComponent() {
@@ -37,24 +38,22 @@ function RouteComponent() {
     defaultValues: {
       username: "",
       email: "",
+      password: "",
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (data: z.infer<typeof userCreationSchema>) => {
-      try {
-        const res = await api.users.create.post({
-          email: data.email,
-          username: data.username,
-        });
-        if (!res.response.ok) {
-          const errorData = JSON.stringify(await res.response.body)
-          throw new Error(errorData || "Server error");
-        }
-        return res;
-      } catch (error) {
-        throw error;
+      const res = await api.users.signUp.post({
+        username: data.username,
+        email: data.email,
+        password: data.password,
+      });
+      if (!res.response.ok) {
+        const errorData = JSON.stringify(await res.response.body);
+        throw new Error(errorData || "Server error");
       }
+      return res;
     },
 
     onError: (error: any) => {
@@ -105,6 +104,19 @@ function RouteComponent() {
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input placeholder="email@email.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input placeholder="Example456@" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
