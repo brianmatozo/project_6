@@ -13,6 +13,10 @@ services:
       - MYSQL_PORT=3306
       - MYSQL_USER=root
       - MYSQL_DATABASE=mydb
+      - JWT_SECRET=9b12b3a5f53adeebf0846d70dec3f254b26def5e0ef56da53030dc8c05e3c652
+      - EMAIL_USER=battlefield.elcapo@gmail.com
+      - EMAIL_PASS=eynl uopt pesu svlh
+      - EMAIL_FROM=noreply@example.com
     volumes:
       - ./frontend/dist:/app/frontend/dist
       - ./package.json:/app/package.json
